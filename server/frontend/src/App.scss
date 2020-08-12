@@ -1,0 +1,16 @@
+@import '~pretty-checkbox/src/pretty-checkbox.scss';
+
+div.App {
+    padding: 20px;
+}
+
+.control-cell  {
+    padding: 20px;
+    width: 100%;   
+}
+
+.pretty.p-switch .state:before {
+    height: calc(1em + 4px);
+    left: -2px;
+    width: calc(2em + 4px);
+}

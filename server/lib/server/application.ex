@@ -15,14 +15,25 @@ defmodule Server.Application do
       {Phoenix.PubSub, name: Server.PubSub},
       # Start the Endpoint (http/https)
       ServerWeb.Endpoint
-      # Start a worker by calling: Server.Worker.start_link(arg)
-      # {Server.Worker, arg}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Server.Supervisor]
     Supervisor.start_link(children, opts)
+
+    Server.BoardData.init_storage()
+
+    # connect to the server and subscribe to foo/bar with QoS 0
+    Tortoise.Supervisor.start_child(
+      client_id: Application.fetch_env!(:server, :client_id),
+      handler: {Server.MqttHandler, []},
+      server:
+        {Tortoise.Transport.Tcp,
+         host: Application.fetch_env!(:server, :host),
+         port: Application.fetch_env!(:server, :port)},
+      subscriptions: [{"iotmeetup/espdevice/#", 0}]
+    )
   end
 
   # Tell Phoenix to update the endpoint configuration
