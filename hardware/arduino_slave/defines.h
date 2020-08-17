@@ -6,6 +6,12 @@
 #define I2C_ARDUINO_ADDRESS 9 // адрес платы Arduino в шине I2C
 #define I2C_LCD_ADDRESS 0x27  // адрес LCD-дисплея в шине I2C
 
+// Шина i2c соединяется так:
+// D1 esp -> A4 ard
+// D2 esp -> A5 ard
+// D1 esp -> SDA индикатора
+// D2 esp -> SCL индикатора
+
 // Исполнительный узел или сенсор в системе
 struct Node
 {
@@ -29,10 +35,10 @@ private:
       {3, "servo", 0, true, false},
       {101, "is_light", 0, false, true},
       {102, "potent", 0, false, true},
-      {103, "range", 0, false, false},
+      {103, "range", 0, false, true},
       {104, "is_motion", 0, false, true},
       {105, "is_barrier", 0, false, true},
-      {106, "temperature", 0, false, false}};
+      {106, "temperature", 0, false, true}};
 
   char packNodeState(char command, int state);
 

@@ -5,18 +5,19 @@
 
 // Номера пинов исполнительных узлов
 #define PIN_IN_PIR_DETECT 2
-#define PIN_OUT_SIMPLE_LED 3
-#define PIN_OUT_220V_SOCK 4
+#define PIN_OUT_SIMPLE_LED 4
+#define PIN_OUT_220V_SOCK 3
 #define PIN_IN_IS_LIGHT 5
-#define PIN_OUT_SONIC_TRIG 6 // Trig дальномера
-#define PIN_IN_SONIC_ECHO 7  // Echo дальномера
-#define PIN_IN_BARRIER 8
-#define PIN_OUT_SERVO 9
+#define PIN_OUT_SONIC_TRIG 8 // Trig дальномера
+#define PIN_IN_SONIC_ECHO 9  // Echo дальномера
+#define PIN_IN_BARRIER 6
+#define PIN_OUT_SERVO 7
 
 #define PIN_IN_POTENT 3 // аналоговый вход A3
-#define PIN_IN_TEMPER 2 // аналоговый вход A2
+#define PIN_IN_TEMPER 1 // аналоговый вход A2
 
 Servo servo;
+int potent = 0;
 
 void setup()
 {
@@ -40,6 +41,7 @@ void setup()
 
 void loop()
 {
+  potent = map(analogRead(PIN_IN_POTENT), 0, 1023, 0, 100);
 }
 
 // колбек-обработчик при получении данных из шины I2C
@@ -88,16 +90,18 @@ void parseCommand(String &input)
 
 void processCommand(char command, int value)
 {
+  Serial.println("command");
+  Serial.println(command);
   switch (command)
   {
-  case 1:
-    digitalWrite(PIN_OUT_SIMPLE_LED, value ? HIGH : LOW);
-    break;
-  case 2:
-    digitalWrite(PIN_OUT_220V_SOCK, value ? LOW : HIGH);
-    break;
-  case 3:
-    servo.write(value);
+    case 1:
+      digitalWrite(PIN_OUT_SIMPLE_LED, value ? HIGH : LOW);
+      break;
+    case 2:
+      digitalWrite(PIN_OUT_220V_SOCK, value ? LOW : HIGH);
+      break;
+    case 3:
+      servo.write(value);
   }
 }
 
@@ -111,12 +115,12 @@ void requestEvent()
 
 void readInputs()
 {
-  nodes_list.set_value(1001, !digitalRead(PIN_IN_IS_LIGHT));
-  nodes_list.set_value(1002, map(analogRead(PIN_IN_POTENT), 0, 1023, 0, 100));
-  nodes_list.set_value(1003, read_distance_cm());
-  nodes_list.set_value(1004, digitalRead(PIN_IN_PIR_DETECT));
-  nodes_list.set_value(1005, !digitalRead(PIN_IN_BARRIER));
-  nodes_list.set_value(1006, read_temper());
+  nodes_list.set_value(101, !digitalRead(PIN_IN_IS_LIGHT));
+  nodes_list.set_value(102, potent);
+  nodes_list.set_value(103, read_distance_cm());
+  nodes_list.set_value(104, digitalRead(PIN_IN_PIR_DETECT));
+  nodes_list.set_value(105, !digitalRead(PIN_IN_BARRIER));
+  nodes_list.set_value(106, read_temper());
 }
 
 int read_distance_cm()

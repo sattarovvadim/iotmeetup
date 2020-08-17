@@ -6,7 +6,7 @@
 
 #include "defines.h"
 
-#define READ_ARDUINO_DELAY 700
+#define READ_ARDUINO_DELAY 200
 
 const char *ssid = "HatkaNet";            // имя wifi-точки доступа
 const char *password = "BebKHvp5";        // пароль точки доступа
@@ -37,12 +37,12 @@ void setup()
   }
   Wire.begin(D1, D2); /* начать соединение по I2C шине с пинами D1 D2 */
 
-  lcd.init();      // Инициализация дисплея
-  lcd.backlight(); // Подключение подсветки
-  //  lcd.setCursor(0, 0);             // Установка курсора в начало первой строки
-  //  lcd.print("Hello from the");     // Набор текста на первой строке
-  //  lcd.setCursor(0, 1);             // Установка курсора в начало второй строки
-  //  lcd.print("ESP8266 board!");
+  lcd.init();                  // Инициализация дисплея
+  lcd.backlight();             // Подключение подсветки
+  lcd.setCursor(0, 0);         // Установка курсора в начало первой строки
+  lcd.print("Hello from the"); // Набор текста на первой строке
+  lcd.setCursor(0, 1);         // Установка курсора в начало второй строки
+  lcd.print("ESP8266 board!");
 }
 
 void loop()
@@ -156,7 +156,8 @@ void readArduinoState(bool fire_publish)
   }
   nodes_list.parse_from_bin(data);
 
-  if (!fire_publish) {
+  if (!fire_publish)
+  {
     return;
   }
 
@@ -164,23 +165,25 @@ void readArduinoState(bool fire_publish)
   // пуш в mqtt-топик
   for (char i = 0; i < numNodes; i++)
   {
-    if (old_data[i] != data[i])
+    if (old_data[i] == data[i])
     {
-      Node node = nodes_list.get_node_by_ind(i);
-      if (!node.fire_publish) {
-        continue;
-      }
-      char topic[32];
-      snprintf(topic, 32, "iotmeetup/espdevice/%s", node.key);
-      const uint8_t payload[1] = {data[i]};
-      client.publish(topic, payload, 1);
-
-      Serial.print("Send to topic ");
-      Serial.print(topic);
-      Serial.print(" value ");
-      Serial.print(String(data[i], DEC));
-      Serial.println();
+      continue;
     }
+    Node node = nodes_list.get_node_by_ind(i);
+    if (!node.fire_publish)
+    {
+      continue;
+    }
+    char topic[32];
+    snprintf(topic, 32, "iotmeetup/espdevice/%s", node.key);
+    const uint8_t payload[1] = {data[i]};
+    client.publish(topic, payload, 1);
+
+    Serial.print("Send to topic ");
+    Serial.print(topic);
+    Serial.print(" value ");
+    Serial.print(String(data[i], DEC));
+    Serial.println();
   }
 }
 
@@ -213,27 +216,27 @@ void handle_command(char command, char value)
   Serial.println(String(command, DEC));
   switch (command)
   {
-    case 1:
-      write_to_i2c("{\"simple_led\":" + String(value, DEC) + "}");
-      break;
-    case 2:
-      write_to_i2c("{\"220v_sock\":" + String(value, DEC) + "}");
-      break;
-    case 3:
-      write_to_i2c("{\"servo\":" + String(value, DEC) + "}");
-      break;
+  case 1:
+    write_to_i2c("{\"simple_led\":" + String(value, DEC) + "}");
+    break;
+  case 2:
+    write_to_i2c("{\"sock_220v\":" + String(value, DEC) + "}");
+    break;
+  case 3:
+    write_to_i2c("{\"servo\":" + String(value, DEC) + "}");
+    break;
 
-    case 127:
-      //  вернуть текущее состояние в mqtt
-      readArduinoState(false);
-      char buffer[jsonCapacity];
-      nodes_list.get_json(buffer);
-      client.publish("iotmeetup/espdevice/data", buffer);
-      break;
+  case 127:
+    //  вернуть текущее состояние в mqtt
+    readArduinoState(false);
+    char buffer[jsonCapacity];
+    nodes_list.get_json(buffer);
+    client.publish("iotmeetup/espdevice/data", buffer);
+    break;
 
-    default:
-      Serial.println("Command from MQTT server is not recognized");
-      break;
+  default:
+    Serial.println("Command from MQTT server is not recognized");
+    break;
   }
 }
 

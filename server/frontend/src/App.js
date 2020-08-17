@@ -75,9 +75,6 @@ const genPieData = (val) => {
 
 
 function App(props) {
-  const [sock_220v, setSock220] = React.useState(props.values.sock_220v);
-  const [servo, setServo] = React.useState([props.values.servo]);
-
   let chart_ref = null;
 
   return (
