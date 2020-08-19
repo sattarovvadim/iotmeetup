@@ -8,10 +8,10 @@
 
 #define READ_ARDUINO_DELAY 200
 
-const char *ssid = "HatkaNet";            // имя wifi-точки доступа
-const char *password = "BebKHvp5";        // пароль точки доступа
+const char *ssid = "your_ssid";           // имя wifi-точки доступа
+const char *password = "your_pass";       // пароль точки доступа
 const int mqtt_port = 1883;               // порт mqtt-брокера
-const char *mqtt_server = "192.168.1.88"; // и его адрес
+const char *mqtt_server = "192.168.1.88"; // и его адрес, тут может быть url в облаке, например, "https://mycloud.com/iotmeetup/broker"
 
 boolean connectWifi();
 void readArduinoState(bool fire_publish);
@@ -40,9 +40,9 @@ void setup()
   lcd.init();                  // Инициализация дисплея
   lcd.backlight();             // Подключение подсветки
   lcd.setCursor(0, 0);         // Установка курсора в начало первой строки
-  lcd.print("Hello from the"); // Набор текста на первой строке
+  lcd.print("Elixir for IoT"); // Набор текста на первой строке
   lcd.setCursor(0, 1);         // Установка курсора в начало второй строки
-  lcd.print("ESP8266 board!");
+  lcd.print("demo-stand!");
 }
 
 void loop()
